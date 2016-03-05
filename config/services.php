@@ -4,7 +4,6 @@
  *
  * @var \Phalcon\Config $config
  */
-
 use Phalcon\Mvc\Router;
 use Phalcon\Mvc\Url as UrlResolver;
 use Phalcon\Di\FactoryDefault;
@@ -23,98 +22,99 @@ $di = new FactoryDefault();
  * Registering a router
  */
 $di->setShared('router', function () {
-	$router = new Router();
-
-	$router->setDefaultModule('frontend');
-	$router->setDefaultNamespace('Store\Frontend\Controllers');
-
-	return $router;
+    $router = new Router();
+    
+    $router->setDefaultModule('frontend');
+    $router->setDefaultNamespace('Store\Frontend\Controllers');
+    
+    return $router;
 });
 
 /**
  * The URL component is used to generate all kinds of URLs in the application
  */
-$di->setShared('url', function () use ($config) {
-	$url = new UrlResolver();
-	$url->setBaseUri($config->application->baseUri);
-
-	return $url;
+$di->setShared('url', function () use($config) {
+    $url = new UrlResolver();
+    $url->setBaseUri($config->application->baseUri);
+    
+    return $url;
 });
 
 /**
  * Setting up the view component
  */
-$di->setShared('view', function () use ($config) {
-
-	$view = new View();
-	echo $config->application->cacheDir;exit;
-	$view->setViewsDir($config->application->viewsDir);
-
-	$view->registerEngines(array(
-		'.volt' => function ($view, $di) use ($config) {
-
-			$volt = new VoltEngine($view, $di);
-
-			$volt->setOptions(array(
-				'compiledPath' => $config->application->cacheDir,
-				'compiledSeparator' => '_'
-			));
-
-			return $volt;
-		},
-		'.phtml' => 'Phalcon\Mvc\View\Engine\Php'
-	));
-
-	return $view;
+$di->setShared('view', function () use($config) {
+    
+    $view = new View();
+    echo $config->application->cacheDir;
+    exit();
+    $view->setViewsDir($config->application->viewsDir);
+    
+    $view->registerEngines(array(
+        '.volt' => function ($view, $di) use($config) {
+            
+            $volt = new VoltEngine($view, $di);
+            
+            $volt->setOptions(array(
+                'compiledPath' => $config->application->cacheDir,
+                'compiledSeparator' => '_'
+            ));
+            
+            return $volt;
+        },
+        '.phtml' => 'Phalcon\Mvc\View\Engine\Php'
+    ));
+    
+    return $view;
 });
 
 /**
  * Database connection is created based in the parameters defined in the configuration file
  */
-$di->setShared('db', function () use ($config) {
-	$dbConfig = $config->database->toArray();
-	$adapter = $dbConfig['adapter'];
-	unset($dbConfig['adapter']);
-
-	$class = 'Phalcon\Db\Adapter\Pdo\\' . $adapter;
-
-	return new $class($dbConfig);
+$di->setShared('db', function () use($config) {
+    $dbConfig = $config->database->toArray();
+    $adapter = $dbConfig['adapter'];
+    unset($dbConfig['adapter']);
+    
+    $class = 'Phalcon\Db\Adapter\Pdo\\' . $adapter;
+    
+    return new $class($dbConfig);
 });
 
 /**
  * If the configuration specify the use of metadata adapter use it or use memory otherwise
  */
 $di->setShared('modelsMetadata', function () {
-	return new MetaDataAdapter();
+    return new MetaDataAdapter();
 });
 
 /**
  * Starts the session the first time some component requests the session service
  */
 $di->setShared('session', function () {
-	$session = new SessionAdapter();
-	$session->start();
-
-	return $session;
+    $session = new SessionAdapter();
+    $session->start();
+    
+    return $session;
 });
 
 /**
  * Register the session flash service with the Twitter Bootstrap classes
  */
 $di->set('flash', function () {
-	return new Flash(array(
-		'error'   => 'alert alert-danger',
-		'success' => 'alert alert-success',
-		'notice'  => 'alert alert-info',
-		'warning' => 'alert alert-warning'
-	));
+    return new Flash(array(
+        'error' => 'alert alert-danger',
+        'success' => 'alert alert-success',
+        'notice' => 'alert alert-info',
+        'warning' => 'alert alert-warning'
+    ));
 });
 
 /**
-* Set the default namespace for dispatcher
-*/
-$di->setShared('dispatcher', function() use ($di) {
-	$dispatcher = new Phalcon\Mvc\Dispatcher();
-	$dispatcher->setDefaultNamespace('Store\Frontend\Controllers');
-	return $dispatcher;
+ * Set the default namespace for dispatcher
+ */
+$di->setShared('dispatcher', function () use($di) {
+    $dispatcher = new Phalcon\Mvc\Dispatcher();
+    $dispatcher->setDefaultNamespace('Store\Frontend\Controllers');
+    return $dispatcher;
 });
