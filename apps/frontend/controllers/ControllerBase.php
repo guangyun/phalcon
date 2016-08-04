@@ -7,6 +7,7 @@ class ControllerBase extends Controller
 {
     public  function IndexAction() {
         $this->view->disable();
+        $this->view->disable();
         var_dump($expression);
         $this->view->disable();
     }
